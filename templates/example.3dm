@@ -1,0 +1,86 @@
+{
+  -- This is the label of the model, i.e. the name of the item when the print
+  -- is in item form (i.e. the name you'll see in the item's tooltip).
+  -- If this is not set, the default name will used ("3D Print").
+  label = "Example Model",
+
+  -- This is the tooltip of the model, i.e. the text displayed in the item's
+  -- tooltip. If this is not set, the item won't have a detailed tooltip.
+  tooltip = "This is an example model, demonstrating all the features.",
+
+  lightLevel = 0,       --[[ The amount of light the printed block should emit.
+                             By default, values in the interval [0,8] are
+                             possible. To create blocks with a higher light
+                             level, craft the printed block with some glowstone
+                             dust, allowing them to reach up to the maximum
+                             light level, 15. This is only available in
+                             OpenComputers version 1.5.7 and later. ]]
+
+  emitRedstone = false, --[[ If this is false it behaves like a door, i.e.
+                             it switches to the model's active state when
+                             a redstone signal goes into the block - if there
+                             is an active state.
+                             If this is true it behaves like a lever or button,
+                             i.e. it emits a redstone signal when in its active
+                             state (set via a player right-clicking the block).
+                             It will not react to redstone if it is an emitter.
+                             The default is false.
+                             Starting with version 1.5.7 of OpenComputers, it is
+                             also possible to provide a number in the interval
+                             [0,15] here, where 0 is equivalent to `false`, and
+                             15 is equivalent to `true`. Arbitrary output
+                             signal strength, i.e. values other than 0 or 15,
+                             will require more material to print. ]]
+
+  buttonMode = false,   --[[ If this is false, the model behaves like a door or
+                             lever, i.e. it will remain in its active state
+                             until there is no redstone signal or it is
+                             activated again by a player.
+                             If this is true, the model will automatically
+                             return to its inactive if it was activated by a
+                             redstone signal or a player, i.e. it will behave
+                             like a button.
+                             The default is false. ]]
+
+  collidable = {true, true} --[[ Determines whether the states of the print are
+                             collidable, i.e. whether players and other
+                             entities collide with them. If false, players and
+                             entities will be able to walk right through the
+                             respective state of the print. This way you can
+                             have a block that becomes passable when in its
+                             alternate state, or make a secret passage.
+                             The default is true for both states. ]]
+                          
+  -- This is the list of shapes defining how the model looks. There has to be
+  -- at least one shape for the model's inactive state for the model to be
+  -- valid. Shapes cannot be "flat", i.e. they have to have a volume. In other
+  -- words, the minimum and maximum coordinate on a single axis must not be
+  -- identical.
+  -- Each shape is declared as 6 numbers, those being the minimum and maximum
+  -- coordinates of the corners of the box represented by the shape (shapes are
+  -- axis aligned bounding boxes), as such: minX, minY, minZ, maxX, maxY, maxZ.
+  -- When looking onto a model, right is positive X, up is positive Y and back
+  -- is positive Z.
+  -- Additionally, a texture is required per shape. To get a name use the
+  -- Texture Picker tool on blocks in the game. As a special case you may set
+  -- the texture name to an empty string, in which case the shape will be fully
+  -- transparent. You can use this in combination with `collidable` (see above)
+  -- to make a print completely "vanish", as has been requested for special
+  -- door constructions, for example.
+  --
+  -- Models can have two states, the inactive state, which is the default, and
+  -- an optional, active state, which is shown when the block is either
+  -- activated (right-clicked) by a player, or when `emitRedstone = false` and
+  -- a redstone signal goes into the block. To assign a shape to the active
+  -- state, set `state = true` in a shape (default is false).
+  shapes = {
+    -- A shape going from <0, 0, 0> (left bottom front) to <8, 8, 8> (middle),
+    -- using the texture of a Lapis Laszuli Block.
+    { 0, 0, 0, 8, 8, 8, texture = "lapis_block" },
+
+    -- A shape going from <8, 8, 8> (middle) to <16, 16, 16> (right top back),
+    -- using the oak leaves texture and a green tint and assigned to the
+    -- model's active state.
+    { 8, 8, 8, 16, 16, 16, texture = "leaves_oak", state = true, tint = 0x48B518 }
+  }
+}

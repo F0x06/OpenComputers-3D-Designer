@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<!--
+
+/*
+ * OpenComputers-3D-Designer - OpenComputers 3D printer scripts (.3dm) viewer/editor 
+ *
+ * Copyright (c) 2015 Kevin Velickovic
+ *
+ *
+ * Author(s):
+ *
+ *      Kevin Velickovic <k.velickovic@gmail.com>
+ *
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional Terms:
+ *
+ *      You are required to preserve legal notices and author attributions in
+ *      that material or in the Appropriate Legal Notices displayed by works
+ *      containing it.
+ */
+
+-->
+
+
+	<head>
+		<title>OpenComputers 3D Designer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<link rel="stylesheet" type="text/css" media="all" href="css/main.css" />
+	</head>
+	<body>
+	
+		<script src="js/lib/three.js"></script>
+		<script src="js/lib/OrbitControls.js"></script>
+		<script src="js/lib/jquery-1.11.3.js"></script>
+		<script src="js/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/lib/ResizeSensor.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/main.js" type="text/javascript" charset="utf-8"></script>
+		
+		<div id="resourcepack">
+		 <a>Resource pack: </a><select>
+		  <option value="Vanilla">Vanilla</option>
+		</select> 
+		<label for="alphaenabled"><input type="checkbox" id="alphaenabled" checked="true" /> <span>Alpha</span></label>
+		</div>
+		<div id="template">
+		 <a>Template: </a><select>
+			<option selected disabled>Select...</option>
+			<option value="button.3dm">button.3dm</option>
+			<option value="cc.3dm">cc.3dm</option>
+			<option value="cover.3dm">cover.3dm</option>
+			<option value="diamond_block.3dm">diamond_block.3dm</option>
+			<option value="example.3dm">example.3dm</option>
+			<option value="netherportal.3dm">netherportal.3dm</option>
+			<option value="pilar.3dm">pilar.3dm</option>
+			<option value="pillar_base.3dm">pillar_base.3dm</option>
+			<option value="pillar_mid.3dm">pillar_mid.3dm</option>
+			<option value="pillar_top.3dm">pillar_top.3dm</option>
+			<option value="pot.3dm">pot.3dm</option>
+			<option value="slab.3dm">slab.3dm</option>
+			<option value="stairs.3dm">stairs.3dm</option>
+			<option value="torch.3dm">torch.3dm</option>
+			<option value="trapdoor.3dm">trapdoor.3dm</option>
+			<option value="tree.3dm">tree.3dm</option>
+			<option value="tree2.3dm">tree2.3dm</option>
+			<option value="villager.3dm">villager.3dm</option>
+			<option value="well.3dm">well.3dm</option>
+		</select> 
+		<button id="statetoggle" type="button">Toggle state</button> 
+		</div>
+		<div id="editor"></div>	
+		<div id="canvas_container">
+		</div>
+		
+	</body>
+</html>

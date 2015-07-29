@@ -1,0 +1,88 @@
+/*
+ * OpenComputers-3D-Designer - OpenComputers 3D printer scripts (.3dm) viewer/editor 
+ *
+ * Copyright (c) 2015 Kevin Velickovic
+ *
+ *
+ * Author(s):
+ *
+ *      Kevin Velickovic <k.velickovic@gmail.com>
+ *
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional Terms:
+ *
+ *      You are required to preserve legal notices and author attributions in
+ *      that material or in the Appropriate Legal Notices displayed by works
+ *      containing it.
+ */
+
+html, body {
+	padding:0;
+	margin:0;
+}
+div#resourcepack {
+	position: absolute;
+	z-index: 1;
+	left: 5px;
+	top: 5px;
+	border: 2px solid #8ac007;
+	padding: 1px;
+	padding-bottom: 3px;
+}
+div#template {
+	position: absolute;
+	z-index: 1;
+	left: 332px;
+	top: 5px;
+	border: 2px solid #8ac007;
+	padding: 1px;
+}
+#resourcepack label {
+	display: block;
+	float: right;
+	padding-right: 10px;
+	white-space: nowrap;
+}
+#resourcepack input {
+	vertical-align: middle;
+}
+#resourcepack label span {
+	vertical-align: middle;
+}
+#resourcepack select {
+	border: none;
+	margin-bottom: 2px;
+}
+div#editor {
+resize: both;
+	position: absolute;
+	top: 40px;
+	left: 5px;
+	margin-right: 70%;
+	border: 2px solid #8AC007;
+	z-index: 1;
+	height:200px;
+	width: 650px;
+}
+div#canvas_container {
+	position: fixed;
+}
+.lineHighlight{
+  position:absolute;
+  z-index:20;
+  background-color:#006600;
+}
