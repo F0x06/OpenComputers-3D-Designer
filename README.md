@@ -1,6 +1,8 @@
 
 ## OpenComputers-3D-Designer<br />OpenComputers 3D printer script (.3dm) realtime viewer/editor
 
+Working demo: http://f0x.me/OpenComputers-3D-Designer/
+
 ### Copyright
 
 Copyright (c) 2015 Kevin Velickovic<br />
