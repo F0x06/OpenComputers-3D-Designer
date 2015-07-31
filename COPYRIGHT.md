@@ -40,3 +40,13 @@ This program includes works distributed under the terms of another license(s) an
     <[https://github.com/ajaxorg/ace)><br />
     Copyright (c) 2010, Ajax.org B.V.<br />
 	ACE is licensed under the [BSD license](https://github.com/ajaxorg/ace/blob/master/LICENSE).
+	
+*   __lua.vm.js__<br />
+    <[https://github.com/kripken/lua.vm.js)><br />
+    Copyright (c) 2013 Alon Zakai (kripken) Copyright (c) 2014 Daurnimator<br />
+	lua.vm.js is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __dkjson.lua__<br />
+    <[http://dkolf.de/src/dkjson-lua.fsl)><br />
+    Copyright (C) 2010-2014 David Heiko Kolf<br />
+	dkjson.lua is licensed under the [MIT license](http://opensource.org/licenses/MIT).

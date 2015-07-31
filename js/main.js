@@ -30,6 +30,8 @@
  *      containing it.
  */
 
+var JLua = null;
+ 
 var camera, scene, renderer;
 var geometry, material, mesh;
 var resourcepack = 'Vanilla';
@@ -48,7 +50,41 @@ var sel_block_mat = new THREE.MeshBasicMaterial({
 	wireframe: true
 });
 
+function luavm_init()
+{
+	JLua = new Lua.State();
+	$.get( "js/lib/lua/dkjson.lua", function( data ) {
+		JLua_g_data = data;
+		
+		JLua.execute('h = io.open("/dkjson.lua", "w"); h:write(js.global.JLua_g_data); h:close()');
+		JLua.execute('json = require("dkjson")');
+		
+	});	
+}
+
+function luavm_decode( input )
+{
+	var json_data = JLua.execute('return json.encode (' + input + ', { indent = false })')[ 0 ];
+	
+	if( json_data )
+	{
+		var json_obj = JSON.parse( json_data );
+		
+		$.each(json_obj.shapes, function(index, value) {
+			if( value.state )
+				json_obj.state_block = true;
+			
+			if( !value.tint )
+				value.tint = 0xffffff;
+		});
+		
+		return json_obj;
+	}
+}
+
 $( document ).ready(function() {
+	
+	luavm_init();
 	init();
 	animate();
 	
@@ -63,17 +99,15 @@ $( document ).ready(function() {
 		
 		var currline = editor.getSelectionRange().start.row;
 		var wholelinetxt = editor.session.getLine(currline);
-		var selected_item = parse_luaserialize(wholelinetxt);
 		
-		change_cursor_event( selected_item );
+		change_cursor_event( wholelinetxt );
 	});
 
 	editor.on('changeSelection', function() {
 		var currline = editor.getSelectionRange().start.row;
 		var wholelinetxt = editor.session.getLine(currline);
-		var selected_item = parse_luaserialize(wholelinetxt);
 		
-		change_cursor_event( selected_item );
+		change_cursor_event( wholelinetxt );
 	});
 	
 	var resourcepack_select = $("#resourcepack select");
@@ -113,9 +147,6 @@ $( document ).ready(function() {
 	new ResizeSensor($('#editor'), function() {
 		editor.resize();
 	});
-	
-	change_event( editor.getValue() );
-
 });
 
 function pad(n, width, z) {
@@ -162,82 +193,41 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
 	return mesh;
 }
 
-function parse_luaserialize( luastring )
+function parse_line_coords( line )
 {
-	var output_items = {
-		'elements'  : [],
-		'state_block' : false
-	};
+	var coords_exp  = /\{\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+).*\"/g;
+	coords_exp_match = coords_exp.exec( line );
 	
-	var lines = luastring.split('\n');
-	
-	for(var i = 0;i < lines.length;i++){
-		
-		var output_item = {
-			'coords' : null,
-			'texture': 'quartz_block_side',
-			'tint'   : 0xffffff,
-			'state'  : null,
-			'line'   : ( i + 1 )
-		};
-		
-		var coords_exp  = /\{\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+).*\"/g;
-		var texture_exp = /texture\s*\=\s*\"(.*)\"/g;
-		var tint_exp    = /tint\s*\=\s*(0x......)/g;
-		var state_exp   = /state\s*\=\s*(true|false)/g;
-		
-		coords_exp_match = coords_exp.exec( lines[i] );
-		texture_exp_match = texture_exp.exec( lines[i] );
-		tint_exp_match = tint_exp.exec( lines[i] );
-		state_exp_match = state_exp.exec( lines[i] );
-
-		if( coords_exp_match )
-		{
-			output_item.coords = [ 
-				parseInt( coords_exp_match[ 1 ] ),
-				parseInt( coords_exp_match[ 2 ] ),
-				parseInt( coords_exp_match[ 3 ] ),
-				parseInt( coords_exp_match[ 4 ] ),
-				parseInt( coords_exp_match[ 5 ] ),
-				parseInt( coords_exp_match[ 6 ] )
-			]
-		}
-
-		if( texture_exp_match )
-			output_item.texture = texture_exp_match[ 1 ];
-		
-		if( tint_exp_match )
-			output_item.tint = parseInt(tint_exp_match[ 1 ], 16);
-		
-		if( state_exp_match )
-		{
-			output_item.state = ( state_exp_match[ 1 ] == "true" );
-			output_items.state_block = true;
-		}
-		
-		if( coords_exp_match )
-			output_items.elements.push( output_item );
+	if( coords_exp_match )
+	{
+		return [ 
+			parseInt( coords_exp_match[ 1 ] ),
+			parseInt( coords_exp_match[ 2 ] ),
+			parseInt( coords_exp_match[ 3 ] ),
+			parseInt( coords_exp_match[ 4 ] ),
+			parseInt( coords_exp_match[ 5 ] ),
+			parseInt( coords_exp_match[ 6 ] )
+		]
 	}
 
-	return output_items;
 }
 
-function change_cursor_event( line_contents_block_array ){
+function change_cursor_event( line ){
 	
-	var line_block = line_contents_block_array.elements[ 0 ];
-	if( line_block )
+	var line_coords = parse_line_coords( line );
+	
+	if( line_coords )
 	{
-	
 		$.each(scene_objects, function(index, value) {
 			var block = value[ 0 ];
 			var block_data = value[ 1 ];
 
-			if( block_data.coords[ 0 ] == line_block.coords[ 0 ]
-				&& block_data.coords[ 1 ] == line_block.coords[ 1 ]
-				&& block_data.coords[ 2 ] == line_block.coords[ 2 ]
-				&& block_data.coords[ 3 ] == line_block.coords[ 3 ]
-				&& block_data.coords[ 4 ] == line_block.coords[ 4 ]
-				&& block_data.coords[ 5 ] == line_block.coords[ 5 ] )
+			if( block_data[ 1 ] == line_coords[ 0 ]
+				&& block_data[ 2 ] == line_coords[ 1 ]
+				&& block_data[ 3 ] == line_coords[ 2 ]
+				&& block_data[ 4 ] == line_coords[ 3 ]
+				&& block_data[ 5 ] == line_coords[ 4 ]
+				&& block_data[ 6 ] == line_coords[ 5 ] )
 			{
 				
 				if( sel_block )
@@ -247,12 +237,12 @@ function change_cursor_event( line_contents_block_array ){
 				}
 				
 				sel_block = create_part( 
-					block_data.coords[ 0 ], 
-					block_data.coords[ 1 ], 
-					block_data.coords[ 2 ], 
-					block_data.coords[ 3 ], 
-					block_data.coords[ 4 ], 
-					block_data.coords[ 5 ],
+					block_data[ 1 ], 
+					block_data[ 2 ], 
+					block_data[ 3 ], 
+					block_data[ 4 ], 
+					block_data[ 5 ], 
+					block_data[ 6 ],
 					null,
 					null,
 					true,
@@ -275,7 +265,7 @@ function change_cursor_event( line_contents_block_array ){
 
 function change_event( content ){
 	
-	var block = parse_luaserialize( content );
+	var block = luavm_decode( content );
 	
 	if( block.state_block )
 		$("#statetoggle").attr("disabled", false);
@@ -286,15 +276,15 @@ function change_event( content ){
 		scene.remove( value[ 0 ] );
 	});
 	
-	$.each(block.elements, function(index, value) {
-
+	$.each(block.shapes, function(index, value) {
+		
 		var clamped_values = [
-			clamp( value.coords[ 0 ], 0, 16 ), 
-			clamp( value.coords[ 1 ], 0, 16 ), 
-			clamp( value.coords[ 2 ], 0, 16 ), 
-			clamp( value.coords[ 3 ], 0, 16 ), 
-			clamp( value.coords[ 4 ], 0, 16 ), 
-			clamp( value.coords[ 5 ], 0, 16 ) 
+			clamp( value[ 1 ], 0, 16 ), 
+			clamp( value[ 2 ], 0, 16 ), 
+			clamp( value[ 3 ], 0, 16 ), 
+			clamp( value[ 4 ], 0, 16 ), 
+			clamp( value[ 5 ], 0, 16 ), 
+			clamp( value[ 6 ], 0, 16 ) 
 		];
 		
 		var padded_values = [];
@@ -347,7 +337,6 @@ function change_event( content ){
 
 }
 
-
 function onMouseDown( event ) {
 
 	// calculate mouse position in normalized device coordinates
@@ -380,12 +369,31 @@ function onMouseDown( event ) {
 			clearTimeout( highlightedLineTimeout );
 		}
 		
-		editor.gotoLine(intersects_object.config.line, 0, true);	
-		highlightLine( intersects_object.config.line - 1);	
+		var lines = editor.getValue().split('\n');
 		
-		highlightedLineTimeout = setTimeout(function(){
-			unhighlightLine();
-		}, 1000);
+		for(var i = 0;i < lines.length;i++){
+			
+			var line_coords = parse_line_coords( lines[ i ] );
+			
+			if( line_coords )
+			{
+				if( intersects_object.config[ 1 ] == line_coords[ 0 ]
+					&& intersects_object.config[ 2 ] == line_coords[ 1 ]
+					&& intersects_object.config[ 3 ] == line_coords[ 2 ]
+					&& intersects_object.config[ 4 ] == line_coords[ 3 ]
+					&& intersects_object.config[ 5 ] == line_coords[ 4 ]
+					&& intersects_object.config[ 6 ] == line_coords[ 5 ] )
+				{
+					var target_line = ( i + 1 );
+					
+					editor.gotoLine(target_line, 0, true);	
+					highlightLine(target_line);	
+					highlightedLineTimeout = setTimeout(function(){
+						unhighlightLine();
+					}, 1000);
+				};
+			}
+		};
 	} else {
 		editor.gotoLine(0, 0, true);	
 	}
@@ -395,7 +403,7 @@ function onMouseDown( event ) {
 function highlightLine(lineNumber) {
 	  unhighlightLine();
 	  var Range = ace.require("ace/range").Range
-	  highlightedLine = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 144), "lineHighlight", "fullLine");
+	  highlightedLine = editor.session.addMarker(new Range(lineNumber - 1, 0, lineNumber - 1, 144), "lineHighlight", "fullLine");
 }
 
 function unhighlightLine(){
