@@ -31,9 +31,7 @@
  */
 
 var JLua = null;
- 
 var camera, scene, renderer;
-var geometry, material, mesh;
 var resourcepack = 'Vanilla';
 var resourcepack_alpha = true;
 var current_state = false;
@@ -163,23 +161,57 @@ function clamp(val, min, max)
 	return clamped;
 }
 
+/*
+function assignUVs( geometry ){
+
+    geometry.computeBoundingBox();
+
+    var max     = geometry.boundingBox.max;
+    var min     = geometry.boundingBox.min;
+
+    var offset  = new THREE.Vector2(0 - min.x, 0 - min.y);
+    var range   = new THREE.Vector2(max.x - min.x, max.y - min.y);
+
+    geometry.faceVertexUvs[0] = [];
+    var faces = geometry.faces;
+
+    for (i = 0; i < geometry.faces.length ; i++) {
+
+      var v1 = geometry.vertices[faces[i].a];
+      var v2 = geometry.vertices[faces[i].b];
+      var v3 = geometry.vertices[faces[i].c];
+
+      geometry.faceVertexUvs[0].push([
+          new THREE.Vector2( ( v1.x + offset.x ) / range.x , ( v1.y + offset.y ) / range.y ),
+          new THREE.Vector2( ( v2.x + offset.x ) / range.x , ( v2.y + offset.y ) / range.y ),
+          new THREE.Vector2( ( v3.x + offset.x ) / range.x , ( v3.y + offset.y ) / range.y )
+      ]);
+
+    }
+    geometry.uvsNeedUpdate = true;
+
+}*/
+
 function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, texture, tint, state, mat_o )
 {
 	var size_1 = ( i_size_1 - i_pos_1 );
 	var size_2 = ( i_size_2 - i_pos_2 );
 	var size_3 = ( i_size_3 - i_pos_3 );
 	
-	var geometry = new THREE.BoxGeometry(size_1, size_2, size_3 );
-	
+	geometry = new THREE.BoxGeometry(size_1, size_2, size_3 );
+
 	var texture_path = ( texture ? 'img/resourcepacks/' + resourcepack + '/blocks/' + texture + '.png' : 'img/grid.png' );
+	var loaded_texture = THREE.ImageUtils.loadTexture(texture_path);
+	
+	loaded_texture.anisotropy = 0;
 	
 	var object_materials = [
-		new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(texture_path), transparent: resourcepack_alpha, color: tint } ),
-		new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(texture_path), transparent: resourcepack_alpha, color: tint } ),
-		new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(texture_path), transparent: resourcepack_alpha, color: tint } ),
-		new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(texture_path), transparent: resourcepack_alpha, color: tint } ),
-		new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(texture_path), transparent: resourcepack_alpha, color: tint } ),
-		new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(texture_path), transparent: resourcepack_alpha, color: tint } )
+		new THREE.MeshPhongMaterial( { map: loaded_texture, transparent: resourcepack_alpha, color: tint } ),
+		new THREE.MeshPhongMaterial( { map: loaded_texture, transparent: resourcepack_alpha, color: tint } ),
+		new THREE.MeshPhongMaterial( { map: loaded_texture, transparent: resourcepack_alpha, color: tint } ),
+		new THREE.MeshPhongMaterial( { map: loaded_texture, transparent: resourcepack_alpha, color: tint } ),
+		new THREE.MeshPhongMaterial( { map: loaded_texture, transparent: resourcepack_alpha, color: tint } ),
+		new THREE.MeshPhongMaterial( { map: loaded_texture, transparent: resourcepack_alpha, color: tint } )
 	]
 	object_meshFaceMaterial = new THREE.MeshFaceMaterial( object_materials );
 	
@@ -189,7 +221,85 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
 		( -8 + ( size_2 / 2 ) ) + i_pos_2, 
 		( -( -8 + ( size_3 / 2 ) ) ) - i_pos_3
 	);
-	
+
+	geometry.computeBoundingBox();
+	geometry.faceVertexUvs = [[]];
+
+	var scale_X = ( geometry.boundingBox.size().x / 16.0 );
+	var scale_Y = ( geometry.boundingBox.size().y / 16.0 );
+	var scale_Z = ( geometry.boundingBox.size().z / 16.0 );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, scale_Y),
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_Z, scale_Y)
+	] );
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_Z, 0),
+	    new THREE.Vector2(scale_Z, scale_Y)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, scale_Y),
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_Z, scale_Y)
+	] );
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_Z, 0),
+	    new THREE.Vector2(scale_Z, scale_Y)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, scale_Z),
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, scale_Z)
+	] );
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, 0),
+	    new THREE.Vector2(scale_X, scale_Z)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, scale_Z),
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, scale_Z)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, 0),
+	    new THREE.Vector2(scale_X, scale_Z)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, scale_Y),
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, scale_Y)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, 0),
+	    new THREE.Vector2(scale_X, scale_Y)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, scale_Y),
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, scale_Y)
+	] );
+
+	geometry.faceVertexUvs[0].push( [
+	    new THREE.Vector2(0, 0),
+	    new THREE.Vector2(scale_X, 0),
+	    new THREE.Vector2(scale_X, scale_Y)
+	] );
+
+	geometry.uvsNeedUpdate = true;
+
 	return mesh;
 }
 
@@ -275,6 +385,8 @@ function change_event( content ){
 	$.each(scene_objects, function(index, value) {
 		scene.remove( value[ 0 ] );
 	});
+	
+	geoms = [];
 	
 	$.each(block.shapes, function(index, value) {
 		
