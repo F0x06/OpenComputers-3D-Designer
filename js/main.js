@@ -36,6 +36,7 @@ var resourcepack = 'Vanilla';
 var resourcepack_alpha = true;
 var current_state = false;
 var editor = null;
+var ground_mesh = null;
 
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
@@ -117,7 +118,10 @@ $( document ).ready(function() {
 	
 	resourcepack_select.on('change', function() {
 		resourcepack = resourcepack_select.val();
-		change_event( editor.getValue() );
+		buildGround();
+		
+		if( editor.getValue().length > 0 )
+			change_event( editor.getValue() );
 	});
 	
 	template_select.on('change', function() {
@@ -162,7 +166,9 @@ function clamp(val, min, max)
 }
 
 function buildGround()
-{
+{	
+	if( ground_mesh )
+		scene.remove( ground_mesh );
 	
 	var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ) );
 	var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ) );
@@ -190,7 +196,7 @@ function buildGround()
 	]
 	var object_meshFaceMaterial = new THREE.MeshFaceMaterial( object_materials );
 
-	var ground_mesh = new THREE.Mesh(
+	ground_mesh = new THREE.Mesh(
 		new THREE.BoxGeometry(48, 16, 48), 
 		object_meshFaceMaterial
 	);
@@ -586,7 +592,7 @@ function init() {
 	scene.add( bounds_mesh );
 	
 	buildGround();
-	
+
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
