@@ -161,6 +161,45 @@ function clamp(val, min, max)
 	return clamped;
 }
 
+function buildGround()
+{
+	
+	var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ) );
+	var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ) );
+	var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ) );
+	
+	texture_side.wrapS = THREE.RepeatWrapping;
+	texture_side.wrapT = THREE.RepeatWrapping;
+	texture_side.repeat.set( 3, 1 );
+	
+	texture_top.wrapS = THREE.RepeatWrapping;
+	texture_top.wrapT = THREE.RepeatWrapping;
+	texture_top.repeat.set( 3, 3 );
+	
+	texture_bot.wrapS = THREE.RepeatWrapping;
+	texture_bot.wrapT = THREE.RepeatWrapping;
+	texture_bot.repeat.set( 3, 3 );
+
+	var object_materials = [
+		new THREE.MeshPhongMaterial( { map: texture_side, transparent: resourcepack_alpha } ),
+		new THREE.MeshPhongMaterial( { map: texture_side, transparent: resourcepack_alpha } ),
+		new THREE.MeshPhongMaterial( { map: texture_top, transparent: resourcepack_alpha, color: 0x48B518 } ),
+		new THREE.MeshPhongMaterial( { map: texture_bot, transparent: resourcepack_alpha } ),
+		new THREE.MeshPhongMaterial( { map: texture_side, transparent: resourcepack_alpha } ),
+		new THREE.MeshPhongMaterial( { map: texture_side, transparent: resourcepack_alpha } )
+	]
+	var object_meshFaceMaterial = new THREE.MeshFaceMaterial( object_materials );
+
+	var ground_mesh = new THREE.Mesh(
+		new THREE.BoxGeometry(48, 16, 48), 
+		object_meshFaceMaterial
+	);
+	
+	ground_mesh.position.set( 0, -16, 0 );
+
+	scene.add( ground_mesh );
+}
+
 function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, texture, tint, state, mat_o )
 {
 	var size_1 = ( i_size_1 - i_pos_1 );
@@ -524,7 +563,7 @@ function init() {
 	
 	scene_objects = [];
 	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera( 42, window.innerWidth / window.innerHeight, 1, 1000);
+	camera = new THREE.PerspectiveCamera( 64, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.z = 45;
 	camera.position.y = 45;
 	camera.position.x = 45;
@@ -545,7 +584,9 @@ function init() {
 	bounds_mesh = new THREE.Mesh(bounds_geometry, bounds_material );
 	
 	scene.add( bounds_mesh );
-
+	
+	buildGround();
+	
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
