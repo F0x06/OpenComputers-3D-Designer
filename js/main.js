@@ -136,6 +136,9 @@ $( document ).ready(function() {
 	
 	alpha_checkbox.on('change', function() {
 		resourcepack_alpha = alpha_checkbox.prop('checked');
+		
+		renderer.sortObjects = !resourcepack_alpha;
+		
 		change_event( editor.getValue() );
 	});
 	
@@ -600,6 +603,7 @@ function init() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
 	renderer.shadowMapEnabled = true;
+	renderer.sortObjects = false
 	
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.noKeys = true;
