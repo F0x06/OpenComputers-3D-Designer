@@ -531,21 +531,24 @@ function onMouseDown( event ) {
 			
 			if( line_coords )
 			{
-				if( intersects_object.config[ 1 ] == line_coords[ 0 ]
-					&& intersects_object.config[ 2 ] == line_coords[ 1 ]
-					&& intersects_object.config[ 3 ] == line_coords[ 2 ]
-					&& intersects_object.config[ 4 ] == line_coords[ 3 ]
-					&& intersects_object.config[ 5 ] == line_coords[ 4 ]
-					&& intersects_object.config[ 6 ] == line_coords[ 5 ] )
+				if( intersects_object.config )
 				{
-					var target_line = ( i + 1 );
-					
-					editor.gotoLine(target_line, 0, true);	
-					highlightLine(target_line);	
-					highlightedLineTimeout = setTimeout(function(){
-						unhighlightLine();
-					}, 1000);
-				};
+					if( intersects_object.config[ 1 ] == line_coords[ 0 ]
+						&& intersects_object.config[ 2 ] == line_coords[ 1 ]
+						&& intersects_object.config[ 3 ] == line_coords[ 2 ]
+						&& intersects_object.config[ 4 ] == line_coords[ 3 ]
+						&& intersects_object.config[ 5 ] == line_coords[ 4 ]
+						&& intersects_object.config[ 6 ] == line_coords[ 5 ] )
+					{
+						var target_line = ( i + 1 );
+						
+						editor.gotoLine(target_line, 0, true);	
+						highlightLine(target_line);	
+						highlightedLineTimeout = setTimeout(function(){
+							unhighlightLine();
+						}, 1000);
+					};
+				}
 			}
 		};
 	} else {
