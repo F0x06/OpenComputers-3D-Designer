@@ -55,16 +55,17 @@
 		<script src="js/lib/ResizeSensor.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/lib/lua.vm.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/main.js" type="text/javascript" charset="utf-8"></script>
-		
-		<div id="resourcepack">
-		 <a>Resource pack: </a><select>
-		  <option value="Vanilla">Vanilla</option>
-		</select> 
-		<label for="alphaenabled"><input type="checkbox" id="alphaenabled" checked="true" /> <span>Alpha</span></label>
-		<label for="nearestfilterenabled"><input type="checkbox" id="nearestfilterenabled" checked="true" /> <span>Sharp Pixels</span></label>
-		</div>
-		<div id="template">
-		 <a>Template: </a><select>
+		<table>
+		 <tr>
+		  <td id="resourcepack">
+		   <a>Resource pack: </a><select>
+		    <option value="Vanilla">Vanilla</option>
+		   </select> 
+		   <label for="alphaenabled"><input type="checkbox" id="alphaenabled" checked="true" /> <span>Alpha</span></label>
+		   <label for="nearestfilterenabled"><input type="checkbox" id="nearestfilterenabled" checked="true" /> <span>Sharp Pixels</span></label>
+		  </td>
+		  <td id="template">
+		   <a>Template: </a><select>
 			<option selected disabled>Select...</option>
 			<option value="button.3dm">button.3dm</option>
 			<option value="cc.3dm">cc.3dm</option>
@@ -85,9 +86,11 @@
 			<option value="tree2.3dm">tree2.3dm</option>
 			<option value="villager.3dm">villager.3dm</option>
 			<option value="well.3dm">well.3dm</option>
-		</select> 
-		<button id="statetoggle" type="button">Toggle state</button> 
-		</div>
+		   </select> 
+		   <button id="statetoggle" type="button">Toggle state</button> 
+		  </td>
+		 </tr>
+		</table>
 		<div id="editor"></div>	
 		<div id="canvas_container">
 		</div>
