@@ -185,6 +185,10 @@ function buildGround()
 	var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ) );
 	var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ) );
 	var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ) );
+	if(resourcepack_nearestfilter)
+		texture_side.magFilter = THREE.NearestFilter;
+		texture_top.magFilter = THREE.NearestFilter;
+		texture_bot.magFilter = THREE.NearestFilter;
 	
 	texture_side.wrapS = THREE.RepeatWrapping;
 	texture_side.wrapT = THREE.RepeatWrapping;
