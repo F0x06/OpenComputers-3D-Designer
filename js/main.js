@@ -230,6 +230,7 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
 	for(i = 0; i < 6; i++)
 	{
 		loaded_textures.push( THREE.ImageUtils.loadTexture(texture_path) );
+		loaded_textures[ i ].magFilter = THREE.NearestFilter;
 		loaded_textures[ i ].anisotropy = 0;
 	}
 	
