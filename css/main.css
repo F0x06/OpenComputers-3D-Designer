@@ -1,50 +1,83 @@
+/*
+ * OpenComputers-3D-Designer - OpenComputers 3D printer scripts (.3dm) viewer/editor 
+ *
+ * Copyright (c) 2015 Kevin Velickovic
+ *
+ *
+ * Author(s):
+ *
+ *      Kevin Velickovic <k.velickovic@gmail.com>
+ *
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional Terms:
+ *
+ *      You are required to preserve legal notices and author attributions in
+ *      that material or in the Appropriate Legal Notices displayed by works
+ *      containing it.
+ */
 
 html, body {
-    margin: 0;
-    padding: 0;
+	padding:0;
+	margin:0;
 }
-#resourcepack {
-    border: 2px solid #8ac007;
-    padding: 1px 1px 3px;
-    z-index: 1;
+td#resourcepack {
+	z-index: 1;
+	border: 2px solid #8ac007;
+	padding: 1px;
+	padding-bottom: 3px;
+	margin-right:5px;
 }
 td#template {
-    border: 2px solid #8ac007;
-    padding: 1px;
-    z-index: 1;
+	z-index: 1;
+	border: 2px solid #8ac007;
+	padding: 1px;
 }
-td#resourcepack label {
-    display: block;
-    float: right;
-    padding-right: 10px;
-    white-space: nowrap;
+#resourcepack label {
+	display: block;
+	float: right;
+	padding-right: 10px;
+	white-space: nowrap;
 }
 #resourcepack input {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 #resourcepack label span {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 #resourcepack select {
-    border: medium none;
-    margin-bottom: 2px;
+	border: none;
+	margin-bottom: 2px;
 }
 div#editor {
-    border: 2px solid #8ac007;
-    height: 200px;
-    left: 5px;
-    margin-right: 70%;
-    position: absolute;
-    resize: both;
-    top: 40px;
-    width: 650px;
-    z-index: 1;
+resize: both;
+	position: absolute;
+	top: 40px;
+	left: 5px;
+	margin-right: 70%;
+	border: 2px solid #8AC007;
+	z-index: 1;
+	height:200px;
+	width: 650px;
 }
 div#canvas_container {
-    position: fixed;
+	position: fixed;
 }
-.lineHighlight {
-    background-color: #006600;
-    position: absolute;
-    z-index: 20;
+.lineHighlight{
+  position:absolute;
+  z-index:20;
+  background-color:#006600;
 }
