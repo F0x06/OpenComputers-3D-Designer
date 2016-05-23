@@ -34,20 +34,15 @@ html, body {
 	padding:0;
 	margin:0;
 }
-div#resourcepack {
-	position: absolute;
+td#resourcepack {
 	z-index: 1;
-	left: 5px;
-	top: 5px;
 	border: 2px solid #8ac007;
 	padding: 1px;
 	padding-bottom: 3px;
+	margin-right:5px;
 }
-div#template {
-	position: absolute;
+td#template {
 	z-index: 1;
-	left: 332px;
-	top: 5px;
 	border: 2px solid #8ac007;
 	padding: 1px;
 }

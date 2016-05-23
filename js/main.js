@@ -34,6 +34,7 @@ var JLua = null;
 var camera, scene, renderer;
 var resourcepack = 'Vanilla';
 var resourcepack_alpha = true;
+var resourcepack_nearestfilter = true;
 var current_state = false;
 var editor = null;
 var ground_mesh = null;
@@ -111,6 +112,7 @@ $( document ).ready(function() {
 	
 	var resourcepack_select = $("#resourcepack select");
 	var alpha_checkbox = $("#resourcepack #alphaenabled");
+	var nearestfilter_checkbox = $("#resourcepack #nearestfilterenabled");
 	var template_select = $("#template select");
 	
 	resourcepack_select.prop('selectedIndex',0);
@@ -138,6 +140,13 @@ $( document ).ready(function() {
 		resourcepack_alpha = alpha_checkbox.prop('checked');
 		
 		renderer.sortObjects = !resourcepack_alpha;
+		
+		change_event( editor.getValue() );
+	});
+	
+	
+	nearestfilter_checkbox.on('change', function() {
+		resourcepack_nearestfilter = nearestfilter_checkbox.prop('checked');
 		
 		change_event( editor.getValue() );
 	});
@@ -176,6 +185,10 @@ function buildGround()
 	var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ) );
 	var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ) );
 	var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ) );
+	if(resourcepack_nearestfilter)
+		texture_side.magFilter = THREE.NearestFilter;
+		texture_top.magFilter = THREE.NearestFilter;
+		texture_bot.magFilter = THREE.NearestFilter;
 	
 	texture_side.wrapS = THREE.RepeatWrapping;
 	texture_side.wrapT = THREE.RepeatWrapping;
@@ -230,6 +243,8 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
 	for(i = 0; i < 6; i++)
 	{
 		loaded_textures.push( THREE.ImageUtils.loadTexture(texture_path) );
+		if(resourcepack_nearestfilter)
+			loaded_textures[ i ].magFilter = THREE.NearestFilter;
 		loaded_textures[ i ].anisotropy = 0;
 	}
 	
