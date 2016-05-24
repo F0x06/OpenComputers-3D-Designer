@@ -42,6 +42,7 @@ var resourcepack_nearestfilter = true;
 var current_state = false;
 var editor = null;
 var ground_mesh = null;
+var needs_update = false;
 
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
@@ -95,17 +96,11 @@ $( document ).ready(function() {
 
     editor.on('input', function() {
         change_event( editor.getValue() );
-
-        var currline = editor.getSelectionRange().start.row;
-        var wholelinetxt = editor.session.getLine(currline);
-
-        change_cursor_event( wholelinetxt );
     });
 
     editor.on('changeSelection', function() {
         var currline = editor.getSelectionRange().start.row;
         var wholelinetxt = editor.session.getLine(currline);
-
         change_cursor_event( wholelinetxt );
     });
 
@@ -137,12 +132,10 @@ $( document ).ready(function() {
 
     alpha_checkbox.on('change', function() {
         resourcepack_alpha = alpha_checkbox.prop('checked');
-
         renderer.sortObjects = !resourcepack_alpha;
         if( editor.getValue().length > 0 )
             change_event( editor.getValue() );
     });
-
 
     nearestfilter_checkbox.on('change', function() {
         resourcepack_nearestfilter = nearestfilter_checkbox.prop('checked');
@@ -165,7 +158,7 @@ $( document ).ready(function() {
 
     luavm_init();
     init();
-    animate();
+    render();
 });
 
 function pad(n, width, z) {
@@ -187,9 +180,9 @@ function buildGround()
     if( ground_mesh )
         scene.remove( ground_mesh );
 
-    var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ) );
-    var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ) );
-    var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ) );
+    var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ), null, onTextureLoaded );
+    var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ), null, onTextureLoaded );
+    var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ), null, onTextureLoaded );
     if(resourcepack_nearestfilter){
         texture_side.magFilter = THREE.NearestFilter;
         texture_top.magFilter = THREE.NearestFilter;
@@ -226,6 +219,7 @@ function buildGround()
     ground_mesh.position.set( 0, -16, 0 );
 
     scene.add( ground_mesh );
+    render();
 }
 
 function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, texture, tint, state, mat_o )
@@ -248,7 +242,7 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
     var loaded_textures = [];
     for(i = 0; i < 6; i++)
     {
-        loaded_textures.push( THREE.ImageUtils.loadTexture(texture_path) );
+        loaded_textures.push( THREE.ImageUtils.loadTexture(texture_path, null, onTextureLoaded) );
         if(resourcepack_nearestfilter)
             loaded_textures[ i ].magFilter = THREE.NearestFilter;
         loaded_textures[ i ].anisotropy = 0;
@@ -426,6 +420,7 @@ function change_cursor_event( line ){
                 );
 
                 scene.add( sel_block );
+                render();
             }
         });
 
@@ -513,10 +508,11 @@ function change_event( content ){
 
     });
 
+    render();
+
 }
 
 function onMouseDown( event ) {
-
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
 
@@ -618,13 +614,13 @@ function init() {
 
     scene.add( bounds_mesh );
 
-    buildGround();
-
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
     renderer.shadowMapEnabled = true;
     renderer.sortObjects = false
+
+    buildGround();
 
     controls = new THREE.OrbitControls( camera, renderer.domElement );
     controls.noKeys = true;
@@ -641,19 +637,37 @@ function init() {
         });
     });
 
+    $canvas.mousedown(function() {
+        needs_update = true;
+        render();
+    });
+    $canvas.mouseup(function() {
+        needs_update = false;
+    });
+    $canvas.bind('mousewheel DOMMouseScroll', function(e){
+        render();
+    });
+
     window.addEventListener( 'resize', onWindowResize, false );
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+function render() {
+    if(needs_update){
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    } else {
+        renderer.render(scene, camera);
+    }
+}
+
+function onTextureLoaded(texture)
+{
+    render();
 }
 
 function onWindowResize(){
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
-
+    render();
 }
