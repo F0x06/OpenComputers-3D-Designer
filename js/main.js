@@ -44,6 +44,7 @@ var editor = null;
 var ground_mesh = null;
 var needs_update = false;
 
+var cursor_event_lock = false;
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var highlightedLine = null;
@@ -107,12 +108,14 @@ $( document ).ready(function() {
     });
 
     editor.on('changeSelection', function() {
-        clearTimeout(change_selection_timer);
-        change_selection_timer = setTimeout(function() {
-            var currline = editor.getSelectionRange().start.row;
-            var wholelinetxt = editor.session.getLine(currline);
-            change_cursor_event( wholelinetxt );
-        }, selection_delay );
+        if(!cursor_event_lock){
+            clearTimeout(change_selection_timer);
+            change_selection_timer = setTimeout(function() {
+                var currline = editor.getSelectionRange().start.row;
+                var wholelinetxt = editor.session.getLine(currline);
+                change_cursor_event( wholelinetxt );
+            }, selection_delay );
+        }
     });
 
     var resourcepack_select = $("#resourcepack select");
@@ -574,11 +577,14 @@ function onMouseDown( event ) {
                     {
                         var target_line = ( i + 1 );
 
+                        change_cursor_event(lines[i]);
+                        cursor_event_lock = true;
                         editor.gotoLine(target_line, 0, true);
                         highlightLine(target_line);
+                       
                         highlightedLineTimeout = setTimeout(function(){
                             unhighlightLine();
-                        }, 1000);
+                        }, 500 );
                     };
                 }
             }
@@ -590,12 +596,13 @@ function onMouseDown( event ) {
 }
 
 function highlightLine(lineNumber) {
-      unhighlightLine();
-      var Range = ace.require("ace/range").Range
-      highlightedLine = editor.session.addMarker(new Range(lineNumber - 1, 0, lineNumber - 1, 144), "lineHighlight", "fullLine");
+    unhighlightLine();
+    var Range = ace.require("ace/range").Range
+    highlightedLine = editor.session.addMarker(new Range(lineNumber - 1, 0, lineNumber - 1, 144), "lineHighlight", "fullLine");
 }
 
 function unhighlightLine(){
+    cursor_event_lock = false;
     editor.getSession().removeMarker( highlightedLine );
     highlightedLine = null;
 }
