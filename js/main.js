@@ -48,6 +48,11 @@ var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var highlightedLine = null;
 var highlightedLineTimeout = null;
+var input_timer = null;
+var change_selection_timer = null;
+
+var input_delay = 500;
+var selection_delay = 200;
 
 var sel_block = null;
 var sel_block_mat = new THREE.MeshBasicMaterial({
@@ -95,13 +100,19 @@ $( document ).ready(function() {
     editor.$blockScrolling = Infinity;
 
     editor.on('input', function() {
-        change_event( editor.getValue() );
+        clearTimeout(input_timer);
+        input_timer = setTimeout(function() {
+            change_event( editor.getValue() );
+        }, input_delay );
     });
 
     editor.on('changeSelection', function() {
-        var currline = editor.getSelectionRange().start.row;
-        var wholelinetxt = editor.session.getLine(currline);
-        change_cursor_event( wholelinetxt );
+        clearTimeout(change_selection_timer);
+        change_selection_timer = setTimeout(function() {
+            var currline = editor.getSelectionRange().start.row;
+            var wholelinetxt = editor.session.getLine(currline);
+            change_cursor_event( wholelinetxt );
+        }, selection_delay );
     });
 
     var resourcepack_select = $("#resourcepack select");
