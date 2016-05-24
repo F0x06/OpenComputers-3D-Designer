@@ -3,6 +3,10 @@
 
 Working demo: http://f0x.me/OpenComputers-3D-Designer/
 
+You can also use in conjunhction my Blender plugin to easly create and export your models to 3DM format:
+
+https://github.com/F0x06/Blender-OpenComputers-3DM-Exporter
+
 ### Copyright
 
 Copyright (c) 2015 Kevin Velickovic<br />
