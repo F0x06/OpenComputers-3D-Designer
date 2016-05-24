@@ -516,8 +516,9 @@ function onMouseDown( event ) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
 
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    var offset = $canvas.offset()
+    mouse.x = ( (event.clientX - offset.left) / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( (event.clientY - offset.top) / window.innerHeight ) * 2 + 1;
 
     // update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
@@ -627,7 +628,7 @@ function init() {
 
     document.getElementById("canvas_container").appendChild(renderer.domElement);
 
-    var $canvas = $('#canvas_container canvas');
+    $canvas = $('#canvas_container canvas');
     $canvas.on('mousedown', function (evt) {
         $canvas.on('mouseup mousemove', function handler(evt) {
             if (evt.type === 'mouseup') {
