@@ -6,7 +6,7 @@
  *
  * Author(s):
  *
- *      Kevin Velickovic <k.velickovic@gmail.com>
+ *      Kevin Velickovic <kevin.velickovic@gmail.com>
  *
  * Contributor(s):
  *
