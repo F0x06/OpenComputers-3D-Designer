@@ -55,6 +55,10 @@ var change_selection_timer = null;
 var input_delay = 500;
 var selection_delay = 200;
 
+var requestedTextures = [];
+var requestRenderAfterTexturesLoaded = false;
+var currentUrl = window.location.href;
+
 var sel_block = null;
 var sel_block_mat = new THREE.MeshBasicMaterial({
     color: 0xEC4C4C,
@@ -183,14 +187,19 @@ function clamp(val, min, max)
     return clamped;
 }
 
+function loadTexture(path) {
+	requestedTextures.push(path);
+	return THREE.ImageUtils.loadTexture(path, null, onTextureLoaded, onTextureError );
+}
+
 function buildGround()
 {
     if( ground_mesh )
         scene.remove( ground_mesh );
 
-    var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ), null, onTextureLoaded );
-    var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ), null, onTextureLoaded );
-    var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ), null, onTextureLoaded );
+    var texture_side = loadTexture('img/resourcepacks/' + resourcepack + '/blocks/grass_side.png');
+    var texture_top  = loadTexture('img/resourcepacks/' + resourcepack + '/blocks/grass_top.png');
+    var texture_bot  = loadTexture('img/resourcepacks/' + resourcepack + '/blocks/dirt.png');
     if(resourcepack_nearestfilter){
         texture_side.magFilter = THREE.NearestFilter;
         texture_top.magFilter = THREE.NearestFilter;
@@ -250,7 +259,7 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
     var loaded_textures = [];
     for(i = 0; i < 6; i++)
     {
-        loaded_textures.push( THREE.ImageUtils.loadTexture(texture_path, null, onTextureLoaded) );
+        loaded_textures.push(loadTexture(texture_path));
         if(resourcepack_nearestfilter)
             loaded_textures[ i ].magFilter = THREE.NearestFilter;
         loaded_textures[ i ].anisotropy = 0;
@@ -655,17 +664,47 @@ function init() {
 }
 
 function render() {
-    if(needs_update){
-        requestAnimationFrame(render);
-        renderer.render(scene, camera);
-    } else {
-        renderer.render(scene, camera);
-    }
+	if(requestedTextures.length == 0) {
+		if(needs_update){
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		} else {
+			renderer.render(scene, camera);
+		}
+	} else {
+		requestRenderAfterTexturesLoaded = true;
+	}
 }
 
 function onTextureLoaded(texture)
 {
-    render();
+	let path = texture.sourceFile;
+	if(path == "") {
+		path = getTexturePathFromUrl(texture.image.src);
+	}
+	
+	onRequestedTexturesUpdate(path);
+}
+
+function onTextureError(error) {
+	onRequestedTexturesUpdate(getTexturePathFromUrl(error.srcElement.src));
+}
+
+function onRequestedTexturesUpdate(path) {
+	let index = requestedTextures.indexOf(path);
+	if(index != -1) {
+		requestedTextures.splice(index, 1);
+	} else {
+		console.log(requestedTextures, texture, path);
+	}
+	if(requestedTextures.length == 0 && requestRenderAfterTexturesLoaded) {
+		requestRenderAfterTexturesLoaded = false;
+		render();
+	}
+}
+
+function getTexturePathFromUrl(url) {
+	return url.substring(currentUrl.length, url.length);
 }
 
 function onWindowResize(){
