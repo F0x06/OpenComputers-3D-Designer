@@ -55,6 +55,10 @@ var change_selection_timer = null;
 var input_delay = 500;
 var selection_delay = 200;
 
+var requestedTextures = [];
+var requestRenderAfterTexturesLoaded = false;
+var currentUrl = window.location.href;
+
 var sel_block = null;
 var sel_block_mat = new THREE.MeshBasicMaterial({
     color: 0xEC4C4C,
@@ -175,12 +179,6 @@ $( document ).ready(function() {
     render();
 });
 
-function pad(n, width, z) {
-    z = z || '0';
-    n = n + '';
-    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-}
-
 function clamp(val, min, max)
 {
     var clamped = ( val > max ? max : val );
@@ -189,14 +187,19 @@ function clamp(val, min, max)
     return clamped;
 }
 
+function loadTexture(path) {
+	requestedTextures.push(path);
+	return THREE.ImageUtils.loadTexture(path, null, onTextureLoaded, onTextureError );
+}
+
 function buildGround()
 {
     if( ground_mesh )
         scene.remove( ground_mesh );
 
-    var texture_side = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_side.png' ), null, onTextureLoaded );
-    var texture_top  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/grass_top.png' ), null, onTextureLoaded );
-    var texture_bot  = THREE.ImageUtils.loadTexture( ( 'img/resourcepacks/' + resourcepack + '/blocks/dirt.png' ), null, onTextureLoaded );
+    var texture_side = loadTexture('img/resourcepacks/' + resourcepack + '/blocks/grass_side.png');
+    var texture_top  = loadTexture('img/resourcepacks/' + resourcepack + '/blocks/grass_top.png');
+    var texture_bot  = loadTexture('img/resourcepacks/' + resourcepack + '/blocks/dirt.png');
     if(resourcepack_nearestfilter){
         texture_side.magFilter = THREE.NearestFilter;
         texture_top.magFilter = THREE.NearestFilter;
@@ -256,7 +259,7 @@ function create_part( i_pos_1, i_pos_2, i_pos_3, i_size_1, i_size_2, i_size_3, t
     var loaded_textures = [];
     for(i = 0; i < 6; i++)
     {
-        loaded_textures.push( THREE.ImageUtils.loadTexture(texture_path, null, onTextureLoaded) );
+        loaded_textures.push(loadTexture(texture_path));
         if(resourcepack_nearestfilter)
             loaded_textures[ i ].magFilter = THREE.NearestFilter;
         loaded_textures[ i ].anisotropy = 0;
@@ -402,41 +405,37 @@ function change_cursor_event( line ){
 
     if( line_coords )
     {
-        $.each(scene_objects, function(index, value) {
-            var block = value[ 0 ];
-            var block_data = value[ 1 ];
 
-            if( block_data[ 1 ] == line_coords[ 0 ]
-                && block_data[ 2 ] == line_coords[ 1 ]
-                && block_data[ 3 ] == line_coords[ 2 ]
-                && block_data[ 4 ] == line_coords[ 3 ]
-                && block_data[ 5 ] == line_coords[ 4 ]
-                && block_data[ 6 ] == line_coords[ 5 ] )
-            {
+		if( sel_block )
+		{
+			scene.remove( sel_block );
+			sel_block = null;
+		}
+		
+		var clamped_values = [
+            clamp( line_coords[ 0 ], 0, 16 ),
+            clamp( line_coords[ 1 ], 0, 16 ),
+            clamp( line_coords[ 2 ], 0, 16 ),
+            clamp( line_coords[ 3 ], 0, 16 ),
+            clamp( line_coords[ 4 ], 0, 16 ),
+            clamp( line_coords[ 5 ], 0, 16 )
+        ];
 
-                if( sel_block )
-                {
-                    scene.remove( sel_block );
-                    sel_block = null;
-                }
+		sel_block = create_part(
+			clamped_values[ 0 ],
+			clamped_values[ 1 ],
+			clamped_values[ 2 ],
+			clamped_values[ 3 ],
+			clamped_values[ 4 ],
+			clamped_values[ 5 ],
+			null,
+			null,
+			true,
+			sel_block_mat
+		);
 
-                sel_block = create_part(
-                    block_data[ 1 ],
-                    block_data[ 2 ],
-                    block_data[ 3 ],
-                    block_data[ 4 ],
-                    block_data[ 5 ],
-                    block_data[ 6 ],
-                    null,
-                    null,
-                    true,
-                    sel_block_mat
-                );
-
-                scene.add( sel_block );
-                render();
-            }
-        });
+		scene.add( sel_block );
+		render();
 
     } else {
         if( sel_block )
@@ -473,12 +472,6 @@ function change_event( content ){
             clamp( value[ 5 ], 0, 16 ),
             clamp( value[ 6 ], 0, 16 )
         ];
-
-        var padded_values = [];
-
-        $.each(clamped_values, function(index, value_i) {
-            padded_values.push( pad( value_i, 2 ) );
-        });
 
         var visibility = false;
 
@@ -671,17 +664,47 @@ function init() {
 }
 
 function render() {
-    if(needs_update){
-        requestAnimationFrame(render);
-        renderer.render(scene, camera);
-    } else {
-        renderer.render(scene, camera);
-    }
+	if(requestedTextures.length == 0) {
+		if(needs_update){
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		} else {
+			renderer.render(scene, camera);
+		}
+	} else {
+		requestRenderAfterTexturesLoaded = true;
+	}
 }
 
 function onTextureLoaded(texture)
 {
-    render();
+	let path = texture.sourceFile;
+	if(path == "") {
+		path = getTexturePathFromUrl(texture.image.src);
+	}
+	
+	onRequestedTexturesUpdate(path);
+}
+
+function onTextureError(error) {
+	onRequestedTexturesUpdate(getTexturePathFromUrl(error.srcElement.src));
+}
+
+function onRequestedTexturesUpdate(path) {
+	let index = requestedTextures.indexOf(path);
+	if(index != -1) {
+		requestedTextures.splice(index, 1);
+	} else {
+		console.log(requestedTextures, texture, path);
+	}
+	if(requestedTextures.length == 0 && requestRenderAfterTexturesLoaded) {
+		requestRenderAfterTexturesLoaded = false;
+		render();
+	}
+}
+
+function getTexturePathFromUrl(url) {
+	return url.substring(currentUrl.length, url.length);
 }
 
 function onWindowResize(){
