@@ -402,41 +402,37 @@ function change_cursor_event( line ){
 
     if( line_coords )
     {
-        $.each(scene_objects, function(index, value) {
-            var block = value[ 0 ];
-            var block_data = value[ 1 ];
 
-            if( block_data[ 1 ] == line_coords[ 0 ]
-                && block_data[ 2 ] == line_coords[ 1 ]
-                && block_data[ 3 ] == line_coords[ 2 ]
-                && block_data[ 4 ] == line_coords[ 3 ]
-                && block_data[ 5 ] == line_coords[ 4 ]
-                && block_data[ 6 ] == line_coords[ 5 ] )
-            {
+		if( sel_block )
+		{
+			scene.remove( sel_block );
+			sel_block = null;
+		}
+		
+		var clamped_values = [
+            clamp( line_coords[ 0 ], 0, 16 ),
+            clamp( line_coords[ 1 ], 0, 16 ),
+            clamp( line_coords[ 2 ], 0, 16 ),
+            clamp( line_coords[ 3 ], 0, 16 ),
+            clamp( line_coords[ 4 ], 0, 16 ),
+            clamp( line_coords[ 5 ], 0, 16 )
+        ];
 
-                if( sel_block )
-                {
-                    scene.remove( sel_block );
-                    sel_block = null;
-                }
+		sel_block = create_part(
+			clamped_values[ 0 ],
+			clamped_values[ 1 ],
+			clamped_values[ 2 ],
+			clamped_values[ 3 ],
+			clamped_values[ 4 ],
+			clamped_values[ 5 ],
+			null,
+			null,
+			true,
+			sel_block_mat
+		);
 
-                sel_block = create_part(
-                    block_data[ 1 ],
-                    block_data[ 2 ],
-                    block_data[ 3 ],
-                    block_data[ 4 ],
-                    block_data[ 5 ],
-                    block_data[ 6 ],
-                    null,
-                    null,
-                    true,
-                    sel_block_mat
-                );
-
-                scene.add( sel_block );
-                render();
-            }
-        });
+		scene.add( sel_block );
+		render();
 
     } else {
         if( sel_block )
