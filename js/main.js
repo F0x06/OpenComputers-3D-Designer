@@ -175,12 +175,6 @@ $( document ).ready(function() {
     render();
 });
 
-function pad(n, width, z) {
-    z = z || '0';
-    n = n + '';
-    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-}
-
 function clamp(val, min, max)
 {
     var clamped = ( val > max ? max : val );
@@ -469,12 +463,6 @@ function change_event( content ){
             clamp( value[ 5 ], 0, 16 ),
             clamp( value[ 6 ], 0, 16 )
         ];
-
-        var padded_values = [];
-
-        $.each(clamped_values, function(index, value_i) {
-            padded_values.push( pad( value_i, 2 ) );
-        });
 
         var visibility = false;
 
